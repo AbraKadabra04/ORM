@@ -8,6 +8,11 @@ DATABASE_URL = "postgresql+psycopg2://username:password@localhost/database_name"
 
 # Создаем подключение к базе данных
 engine = create_engine(DATABASE_URL)
+
+# Создаем таблицы в базе данных (если они еще не существуют)
+Base.metadata.create_all(engine)
+
+# Создаем сессию для работы с базой данных
 Session = sessionmaker(bind=engine)
 session = Session()
 
@@ -40,7 +45,6 @@ def get_sales_by_publisher(publisher_name_or_id: str):
 
         # Выполняем запрос и обрабатываем результаты
         results = query.all()
-
         if not results:
             print(f"Нет данных для издателя: {publisher_name_or_id}")
             return
@@ -49,13 +53,11 @@ def get_sales_by_publisher(publisher_name_or_id: str):
         for title, shop_name, price, date_sale in results:
             # Форматируем дату и выводим результат
             print(f"{title} | {shop_name} | {price:.2f} | {date_sale.strftime('%d-%m-%Y')}")
-
     except Exception as e:
         print(f"Ошибка при выполнении запроса: {e}")
     finally:
         # Закрываем сессию
         session.close()
-
 
 if __name__ == "__main__":
     # Ввод имени или идентификатора издателя
